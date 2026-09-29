@@ -1,0 +1,199 @@
+@extends('layouts.admin')
+
+@section('title', 'Review & Edit Product: ' . $product->title)
+
+@section('content')
+<div class="max-w-4xl mx-auto py-2 space-y-6">
+
+    <div class="flex items-center justify-between border-b border-slate-200 pb-5">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">Catalog Editorial Review</span>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Review & Edit Product & Manufacturer</h1>
+            <p class="text-xs text-slate-500 mt-1">Admin review portal: Edit specifications, manufacturer website links, and approval status.</p>
+        </div>
+        <a href="{{ route('admin.products.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
+            <span>&larr; Back to Products</span>
+        </a>
+    </div>
+
+    <!-- Submitting Author Card -->
+    <div class="bg-white border border-slate-200/90 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-center gap-4">
+            @if($product->author)
+                <img src="{{ $product->author->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($product->author->name) }}" class="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-2xs">
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-blue-700 tracking-wider block">Submitted By Author / Manufacturer</span>
+                    <strong class="text-base text-slate-900 block font-bold">{{ $product->author->name }}</strong>
+                    <span class="text-xs text-slate-500">{{ $product->author->company ?? $product->author->country }} &bull; {{ $product->author->email }}</span>
+                </div>
+            @else
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Submitted Directly</span>
+                    <strong class="text-base text-slate-900 block font-bold">Editorial In-House</strong>
+                </div>
+            @endif
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-500 font-medium">Current Status:</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider {{ $product->status === 'approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($product->status === 'pending' ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-rose-50 text-rose-700 border border-rose-200') }}">
+                {{ $product->status }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Full Edit Form -->
+    <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/90 shadow-sm text-xs">
+        @csrf
+        @method('PUT')
+
+        @if ($errors->any())
+        <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs">
+            <div class="font-bold mb-1.5 flex items-center gap-1.5 text-rose-900">
+                <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                    <line x1="12" y1="8" x2="12" y2="12" stroke-width="2"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2"/>
+                </svg>
+                <span>Please correct the following errors:</span>
+            </div>
+            <ul class="list-disc list-inside space-y-0.5 pl-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        <!-- Status & Editorial Decision Block -->
+        <div class="p-5 bg-blue-50/40 border border-blue-200/80 rounded-2xl space-y-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <h3 class="text-xs font-bold text-blue-900 uppercase tracking-wider">Catalog Publication Control</h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">Publication Status *</label>
+                    <select name="status" required class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                        <option value="pending" {{ old('status', $product->status) === 'pending' ? 'selected' : '' }}>Pending Review (Hidden from public catalog)</option>
+                        <option value="approved" {{ old('status', $product->status) === 'approved' ? 'selected' : '' }}>Approved & Live (Visible in Catalog & Showcase)</option>
+                        <option value="rejected" {{ old('status', $product->status) === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                    </select>
+                </div>
+            <div class="pt-3 border-t border-blue-200/60 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label class="flex items-center gap-2 font-semibold text-slate-700 cursor-pointer p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50">
+                    <input type="checkbox" name="is_property_sell" value="1" {{ old('is_property_sell', $product->is_property_sell) ? 'checked' : '' }} class="rounded border-slate-300 text-emerald-600 focus:ring-0">
+                    <div>
+                        <span class="block text-slate-900 font-bold">Feature in "PROPERTY SELL POST"</span>
+                        <span class="text-[10px] text-slate-500 font-normal">Show on homepage right sidebar "PROPERTY SELL POST"</span>
+                    </div>
+                </label>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Price / Price Range (Optional)</label>
+                    <input type="text" name="price" value="{{ old('price', $product->price) }}" class="w-full px-3.5 py-2 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" placeholder="e.g. $450 or Contact for Price">
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">Product & Manufacturer Attributes</h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">Product Title *</label>
+                    <input type="text" name="title" required value="{{ old('title', $product->title) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">Slug (URL identifier) *</label>
+                    <input type="text" name="slug" required value="{{ old('slug', $product->slug) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl font-mono focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">Manufacturer / Brand Name *</label>
+                    <input type="text" name="manufacturer" required value="{{ old('manufacturer', $product->manufacturer) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5">Category *</label>
+                    <select name="category" required class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat }}" {{ old('category', $product->category) === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- Manufacturer Links (User prompt: porduct ar website link add kora jabe) -->
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                <span class="text-xs font-bold text-slate-900 block">Manufacturer Direct Contact & Website Links</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Official Website Link (URL)</label>
+                        <input type="url" name="website_url" value="{{ old('website_url', $product->website_url) }}" class="w-full px-3.5 py-2 bg-white border border-slate-300 text-slate-900 rounded-xl font-mono text-xs focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none" placeholder="https://manufacturer.com">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Contact Phone</label>
+                        <input type="text" name="contact_phone" value="{{ old('contact_phone', $product->contact_phone) }}" class="w-full px-3.5 py-2 bg-white border border-slate-300 text-slate-900 rounded-xl text-xs focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none" placeholder="+1 (800) 234-5678">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Contact Email</label>
+                        <input type="email" name="contact_email" value="{{ old('contact_email', $product->contact_email) }}" class="w-full px-3.5 py-2 bg-white border border-slate-300 text-slate-900 rounded-xl text-xs focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none" placeholder="inquiry@brand.com">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1.5">BIM / CAD Interactive Model URL (3D Preview)</label>
+                <input type="text" name="bim_file_url" value="{{ old('bim_file_url', $product->bim_file_url) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl font-mono focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all" placeholder="https://bimx.graphisoft.com/model/...">
+            </div>
+
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1.5">Short Excerpt (Catalog Summary) *</label>
+                <textarea name="short_description" rows="2" required class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">{{ old('short_description', old('excerpt', $product->short_description ?? $product->excerpt)) }}</textarea>
+            </div>
+
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1.5">Full Product Description / Technical Context (Text & Multiple Inline Photos)</label>
+                <x-rich-editor name="use_description" :value="old('use_description', old('description', $product->use_description ?? $product->description))" placeholder="Detailed architectural description, technical specs, application context..." minHeight="280px" />
+            </div>
+
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1.5">Technical Specifications (Format: Key: Value, one per line)</label>
+                @php
+                    $specsText = '';
+                    if (is_array($product->specifications)) {
+                        foreach ($product->specifications as $k => $v) {
+                            $specsText .= "$k: $v\n";
+                        }
+                    }
+                @endphp
+                <textarea name="specifications_text" rows="5" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl font-mono text-xs focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all" placeholder="Material: Natural Oak Timber&#10;Thermal Insulation: U-value 0.12 W/m²K&#10;Fire Rating: Class A1 non-combustible">{{ old('specifications_text', trim($specsText)) }}</textarea>
+            </div>
+        </div>
+
+        <x-direct-image-upload 
+            featured-label="Product Primary Image"
+            featured-help="Directly upload high-resolution product photography. Stored in public/uploads/."
+            gallery-label="Product Gallery & Applications (Select 4-5 Photos)"
+            gallery-help="Select multiple detail photos, materials, and installed application shots."
+            :current-featured="$product->featured_image"
+            :current-gallery="$product->gallery"
+        />
+
+        <div class="pt-6 border-t border-slate-200 flex items-center justify-between">
+            <a href="{{ route('admin.products.index') }}" class="text-xs text-slate-500 hover:text-slate-900 font-semibold transition-colors">
+                Cancel
+            </a>
+            <button type="submit" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-2">
+                <span>Save Changes & Update Product</span>
+                <span>&rarr;</span>
+            </button>
+        </div>
+    </form>
+
+</div>
+@endsection
