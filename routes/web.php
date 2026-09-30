@@ -32,6 +32,8 @@ use App\Http\Controllers\Admin\AdminArticleController;
 use App\Http\Controllers\Admin\AdminNewsController;
 use App\Http\Controllers\Admin\AdminInquiryController;
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminPartnerController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\EditorUploadController;
 
@@ -130,6 +132,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+        // Admin Profile Management
+        Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
+
         // Project Management (Review, Edit all, Approve, Reject, Delete)
         Route::get('/projects', [AdminProjectController::class, 'index'])->name('projects.index');
         Route::get('/projects/create', [AdminProjectController::class, 'create'])->name('projects.create');
@@ -193,6 +199,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/inquiries', [AdminInquiryController::class, 'index'])->name('inquiries.index');
         Route::get('/inquiries/{id}', [AdminInquiryController::class, 'show'])->name('inquiries.show');
         Route::delete('/inquiries/{id}', [AdminInquiryController::class, 'destroy'])->name('inquiries.destroy');
+
+        // Partners Management (Footer Partners)
+        Route::resource('partners', AdminPartnerController::class)->except(['create', 'show', 'edit']);
+        Route::post('/partners/{id}/toggle-status', [AdminPartnerController::class, 'toggleStatus'])->name('partners.toggle-status');
 
         // General System & Settings
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');

@@ -7,11 +7,7 @@
 
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">Author Record</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Author Profile & Submission History</h1>
-            <p class="text-xs text-slate-500 mt-1">Review author details, verify their projects, and manage permissions.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Author Profile</h1>
         </div>
         <a href="{{ route('admin.authors.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
             <span>&larr; Back to Authors</span>

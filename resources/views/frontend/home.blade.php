@@ -1,6 +1,6 @@
 @extends('layouts.frontend')
 
-@section('title', 'nook MAGAZINE | Architectural Projects, Interiors & Design Showcase')
+@section('title', \App\Models\Setting::siteTitle())
 
 @section('content')
 <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-8">

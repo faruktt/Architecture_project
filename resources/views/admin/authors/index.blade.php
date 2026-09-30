@@ -7,11 +7,7 @@
 
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">Architect Directory</span>
-            </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Author & Architect Management</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">Supervise registered architects, review contributor activities, and control account permissions.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Authors & Architects</h1>
         </div>
         <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-2xs">
             <span class="text-xs text-slate-600 font-medium">Total: <strong class="text-slate-900">{{ $counts['total'] }}</strong> ({{ $counts['active'] }} Active, {{ $counts['banned'] }} Suspended)</span>
@@ -82,24 +78,27 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <a href="{{ route('admin.authors.show', $author->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg font-bold transition-all shadow-2xs hover:border-slate-400">
-                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <span>Submissions</span>
-                                </a>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <a href="{{ route('admin.authors.show', $author->id) }}" 
+                                       title="View Submissions" 
+                                       class="w-8 h-8 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-300 flex items-center justify-center transition-all shadow-2xs hover:scale-105 hover:border-slate-400">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </a>
 
-                                <form action="{{ route('admin.authors.toggle-status', $author->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 {{ $author->status === 'active' ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200' }} rounded-lg font-semibold transition-all">
-                                        @if($author->status === 'active')
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                                            <span>Suspend</span>
-                                        @else
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Reactivate</span>
-                                        @endif
-                                    </button>
-                                </form>
+                                    <form action="{{ route('admin.authors.toggle-status', $author->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                                title="{{ $author->status === 'active' ? 'Suspend Author' : 'Reactivate Author' }}" 
+                                                class="w-8 h-8 rounded-lg {{ $author->status === 'active' ? 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200' }} flex items-center justify-center transition-all shadow-2xs hover:scale-105 cursor-pointer">
+                                            @if($author->status === 'active')
+                                                <i class="fa-solid fa-ban text-xs"></i>
+                                            @else
+                                                <i class="fa-solid fa-check text-xs"></i>
+                                            @endif
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

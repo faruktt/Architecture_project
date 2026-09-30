@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+    <path d="M16 6L6 12v14l10 6 10-6V12L16 6zm0 2.8l7 4.2-7 4.2-7-4.2 7-4.2zM8 14.5l6.5 3.9v8.2L8 22.7v-8.2zm16 8.2l-6.5 3.9v-8.2l6.5-3.9v8.2z" fill="#18181b"/>
+    <text x="36" y="20" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="900" font-size="14" fill="#18181b" letter-spacing="1.5">HOLCIM</text>
+    <text x="36" y="30" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="700" font-size="9" fill="#3f3f46" letter-spacing="1">FOUNDATION</text>
+    <text x="36" y="38" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="600" font-size="6.5" fill="#71717a" letter-spacing="0.5">SUSTAINABLE CONSTRUCTION</text>
+</svg>

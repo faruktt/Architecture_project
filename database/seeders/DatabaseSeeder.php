@@ -737,5 +737,6 @@ class DatabaseSeeder extends Seeder
         // 6. CMS Pages
         $this->call(PageSeeder::class);
         $this->call(CategoryAndCountrySeeder::class);
+        $this->call(PartnerSeeder::class);
     }
 }

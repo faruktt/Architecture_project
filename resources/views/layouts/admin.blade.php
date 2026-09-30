@@ -5,308 +5,639 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Editorial Admin | nook MAGAZINE')</title>
+    @php
+        $adminSiteTitle = \App\Models\Setting::siteTitle();
+        $adminSiteFavicon = \App\Models\Setting::faviconUrl();
+    @endphp
+
+    <title>@yield('title', 'Admin | ' . $adminSiteTitle)</title>
+    @if($adminSiteFavicon)
+        <link rel="icon" type="image/x-icon" href="{{ $adminSiteFavicon }}">
+        <link rel="shortcut icon" href="{{ $adminSiteFavicon }}">
+        <link rel="apple-touch-icon" href="{{ $adminSiteFavicon }}">
+    @endif
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cinzel:wght@700;800&display=swap" rel="stylesheet">
 
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8fafc;
+            background-color: #f4f7fa;
             color: #0f172a;
         }
+        /* Adminty Dark Navy Theme for Sidebar */
         .admin-sidebar {
-            background-color: #ffffff;
-            border-right: 1px solid #e2e8f0;
+            background-color: #404e67 !important;
+            border-right: 1px solid #333f54 !important;
+            color: #a0b1cc;
+        }
+        .admin-sidebar-header {
+            background-color: #353c48 !important;
+            border-bottom: 1px solid #2f3640 !important;
+        }
+        .admin-sidebar-footer {
+            background-color: #353c48 !important;
+            border-top: 1px solid #2f3640 !important;
+        }
+        .admin-sidebar-nav-heading {
+            color: #8392a7;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .admin-sidebar-link {
+            color: #9cb0cc;
+            transition: all 0.15s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .admin-sidebar-link:hover {
+            color: #ffffff;
+            background-color: #353f53;
+        }
+        .admin-sidebar-link.is-active {
+            color: #fe5d70 !important;
+            background-color: #353f53 !important;
+            border-left: 3px solid #fe5d70 !important;
+        }
+        .admin-sidebar-link.is-active svg {
+            color: #fe5d70 !important;
         }
         .admin-content {
-            background-color: #f8fafc;
+            background-color: #f4f7fa;
         }
         /* Custom scrollbars for high-end feel */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar-track { background: #353c48; }
+        ::-webkit-scrollbar-thumb { background: #526380; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #687d9f; }
+
+        /* Sleek scrollbar for fixed sidebar nav */
+        .admin-sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .admin-sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .admin-sidebar-scroll::-webkit-scrollbar-thumb { background: #526380; border-radius: 9999px; }
+        .admin-sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #fe5d70; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-amber-200 selection:text-amber-950">
+<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-[#fe5d70]/20 selection:text-[#fe5d70]">
 
     @php
         $adminSiteLogo = \App\Models\Setting::logoUrl();
         $adminSiteLogoText = \App\Models\Setting::logoText();
     @endphp
 
-    <!-- Mobile Header with Hamburger Toggle -->
-    <div class="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-xs">
-        <div class="flex items-center gap-2">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                @if($adminSiteLogo)
-                    <img src="{{ $adminSiteLogo }}" alt="{{ $adminSiteLogoText }}" class="h-6 max-w-[100px] object-contain">
-                @else
-                    <span class="font-black text-slate-900 text-lg tracking-tight lowercase" style="font-family: 'Cinzel', serif;">{{ $adminSiteLogoText }}</span>
-                @endif
-            </a>
-            <span class="text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-200 px-1.5 py-0.5 rounded-full uppercase tracking-wider">ADMIN</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('home') }}" target="_blank" class="text-xs text-slate-500 hover:text-slate-900 font-medium px-2 py-1 rounded bg-slate-100">
-                Site &nearr;
-            </a>
+    <!-- Mobile Header with Hamburger Toggle and Admin Avatar Dropdown -->
+    <div class="md:hidden bg-[#353c48] border-b border-[#2b323d] px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md">
+        <div class="flex items-center gap-2.5">
             <button type="button"
                     onclick="document.getElementById('admin-sidebar').classList.toggle('hidden')"
-                    class="p-1.5 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-lg focus:outline-none"
+                    class="p-2 text-slate-300 hover:text-white hover:bg-[#404e67] rounded-lg focus:outline-none transition-colors cursor-pointer"
                     aria-label="Toggle Navigation Sidebar">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <i class="fa-solid fa-bars text-base"></i>
             </button>
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center">
+                @if($adminSiteLogo)
+                    <img src="{{ $adminSiteLogo }}" alt="{{ $adminSiteLogoText }}" class="h-8 max-w-[140px] object-contain rounded">
+                @else
+                    <span class="font-bold text-white text-lg tracking-tight lowercase" style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ $adminSiteLogoText }}</span>
+                @endif
+            </a>
+            <span class="text-[9px] font-bold bg-[#fe5d70]/20 text-[#fe5d70] border border-[#fe5d70]/40 px-1.5 py-0.5 rounded uppercase tracking-wider">ADMIN</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('home') }}" target="_blank" class="text-xs text-slate-300 hover:text-white font-medium px-2 py-1 rounded bg-[#404e67] border border-[#526380]/40 flex items-center gap-1">
+                <span>Site</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </a>
+
+            <!-- Mobile Admin Avatar Dropdown Trigger -->
+            <div class="relative admin-dropdown-container">
+                <button type="button"
+                        onclick="toggleAdminDropdown('mobile-admin-dropdown-menu')"
+                        class="p-0.5 rounded-full hover:ring-2 hover:ring-[#fe5d70] focus:outline-none cursor-pointer flex items-center transition-all"
+                        title="Admin Profile Menu">
+                    <img src="{{ Auth::guard('admin')->user()->avatar }}"
+                         alt="{{ Auth::guard('admin')->user()->name ?? 'Admin' }}"
+                         class="w-7 h-7 rounded-full object-cover border border-[#526380] shadow-2xs">
+                </button>
+
+                <div id="mobile-admin-dropdown-menu"
+                     class="admin-dropdown-menu hidden absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 transition-all duration-150 transform opacity-0 scale-95 origin-top-right">
+                    <div class="px-4 py-2.5 border-b border-slate-100">
+                        <div class="text-xs font-bold text-slate-900 truncate">{{ Auth::guard('admin')->user()->name ?? 'Administrator' }}</div>
+                        <div class="text-[10px] text-slate-400 truncate">{{ Auth::guard('admin')->user()->email ?? 'admin@editorial.com' }}</div>
+                        <span class="inline-block mt-1 text-[9px] font-extrabold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 px-1.5 py-0.2 rounded">SUPER ADMIN</span>
+                    </div>
+                    <div class="py-1 text-xs">
+                        <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50 font-medium">
+                            <i class="fa-solid fa-user-pen text-[#fe5d70] w-4 text-center"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                        <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-slate-700 hover:bg-slate-50 font-medium">
+                            <i class="fa-solid fa-sliders text-[#01a9ac] w-4 text-center"></i>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                    <div class="border-t border-slate-100 my-1"></div>
+                    <form action="{{ route('admin.logout') }}" method="POST" class="p-1">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-2 px-3 py-1.5 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-semibold text-left cursor-pointer">
+                            <i class="fa-solid fa-right-from-bracket text-rose-600 w-4 text-center"></i>
+                            <span>Sign Out</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- ================= ADMIN SIDEBAR ================= -->
-    <!-- "admin sidebar asob feature thakbe ,, page create, author management, project , product, news chara o sob feature admin ar sidebar a thakbe." -->
-    <aside id="admin-sidebar" class="hidden md:flex w-full md:w-64 admin-sidebar flex-shrink-0 flex-col justify-between py-6 min-h-screen">
-        <div>
-            <!-- Brand / Logo -->
-            <div class="px-6 pb-6 border-b border-slate-100">
-                <a href="{{ route('admin.dashboard') }}" class="block group">
-                    <div class="flex items-center gap-2.5">
-                        @if($adminSiteLogo)
-                            <img src="{{ $adminSiteLogo }}" alt="{{ $adminSiteLogoText }}" class="h-7 max-w-[120px] object-contain">
-                        @else
-                            <span class="text-2xl font-black tracking-tight text-slate-950 group-hover:text-amber-600 transition-colors lowercase" style="font-family: 'Cinzel', serif;">{{ $adminSiteLogoText }}</span>
-                        @endif
-                        <span class="text-[9px] font-black uppercase tracking-widest bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded-md">Control</span>
-                    </div>
-                    <span class="text-[11px] font-medium text-slate-400 block mt-1 tracking-wide">Architecture Editorial Panel</span>
-                </a>
-                <div class="mt-3.5 inline-flex items-center gap-2 px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 rounded-full text-[11px] font-medium text-emerald-800">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Admin Guard Active</span>
-                </div>
-            </div>
+    <aside id="admin-sidebar" class="hidden md:flex flex-col w-72 md:w-64 admin-sidebar flex-shrink-0 h-screen sticky top-0 z-30 shadow-lg md:shadow-none">
+        <!-- Top Brand Header: Fixed at top of sidebar -->
+        <div class="px-5 py-4 admin-sidebar-header flex items-center flex-shrink-0">
+            <a href="{{ route('admin.dashboard') }}" class="block group">
+                @if($adminSiteLogo)
+                    <img src="{{ $adminSiteLogo }}" 
+                         alt="{{ $adminSiteLogoText }}" 
+                         class="h-9 sm:h-10 max-w-[190px] object-contain rounded-md transition-transform group-hover:scale-105">
+                @else
+                    <span class="text-2xl font-black tracking-tight text-white group-hover:text-[#fe5d70] transition-colors lowercase" style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ $adminSiteLogoText }}</span>
+                @endif
+            </a>
+        </div>
 
+        <!-- Scrollable Navigation Area (Middle scrolls smoothly if long, footer remains fixed) -->
+        <div class="flex-1 overflow-y-auto min-h-0 admin-sidebar-scroll">
             <!-- Navigation Links -->
             @php
                 $pendingProjectsBadge = \App\Models\Project::where('status', 'pending')->count();
                 $pendingProductsBadge = \App\Models\Product::where('status', 'pending')->count();
                 $newInquiriesBadge = \App\Models\ProductInquiry::where('status', 'new')->count();
             @endphp
-            <nav class="px-3 pt-5 space-y-1 text-xs">
-                <!-- 1. Dashboard -->
-                <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.dashboard') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-4 h-4 {{ request()->routeIs('admin.dashboard') ? 'text-amber-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        <span>Dashboard</span>
-                    </div>
-                </a>
+            <nav class="pt-2 pb-4 text-xs">
+                <!-- SECTION 1: NAVIGATION -->
+                <div class="px-5 pt-3 pb-1.5 admin-sidebar-nav-heading">
+                    Navigation
+                </div>
 
-                <!-- 2. Project Management -->
-                <div class="pt-3">
-                    <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Architecture</span>
-                    <a href="{{ route('admin.projects.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.projects.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                <div class="space-y-0.5">
+                    <!-- Dashboard -->
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ request()->routeIs('admin.projects.*') ? 'text-emerald-400' : 'text-emerald-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            <i class="fa-solid fa-gauge-high w-4 text-center text-xs"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <span class="bg-[#01a9ac] text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-2xs">NEW</span>
+                    </a>
+                </div>
+
+                <!-- SECTION 2: UI ELEMENT / ARCHITECTURE -->
+                <div class="px-5 pt-4 pb-1.5 admin-sidebar-nav-heading">
+                    UI Element
+                </div>
+
+                <div class="space-y-0.5">
+                    <!-- Projects -->
+                    <a href="{{ route('admin.projects.index') }}"
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.projects.*') ? 'is-active' : '' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-cubes w-4 text-center text-xs"></i>
                             <span>Projects</span>
                         </div>
-                        @if($pendingProjectsBadge > 0)
-                            <span class="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full" title="{{ $pendingProjectsBadge }} Pending Review">
-                                {{ $pendingProjectsBadge }}
-                            </span>
-                        @endif
+                        <div class="flex items-center gap-1.5">
+                            @if($pendingProjectsBadge > 0)
+                                <span class="bg-[#fe5d70] text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-full" title="{{ $pendingProjectsBadge }} Pending">
+                                    {{ $pendingProjectsBadge }}
+                                </span>
+                            @endif
+                            <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
+                        </div>
                     </a>
 
                     <!-- Project Categories Link -->
                     <a href="{{ route('admin.project-categories.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2 rounded-xl font-medium transition-all duration-150 mt-0.5 {{ request()->routeIs('admin.project-categories.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
-                        <div class="flex items-center gap-3 pl-1">
-                            <svg class="w-3.5 h-3.5 {{ request()->routeIs('admin.project-categories.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.project-categories.*') ? 'is-active' : '' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-tags w-4 text-center text-xs"></i>
                             <span>Project Categories</span>
                         </div>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
                     </a>
 
                     <!-- Countries Link -->
                     <a href="{{ route('admin.countries.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2 rounded-xl font-medium transition-all duration-150 mt-0.5 {{ request()->routeIs('admin.countries.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
-                        <div class="flex items-center gap-3 pl-1">
-                            <svg class="w-3.5 h-3.5 {{ request()->routeIs('admin.countries.*') ? 'text-blue-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.countries.*') ? 'is-active' : '' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-earth-americas w-4 text-center text-xs"></i>
                             <span>Countries</span>
                         </div>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
                     </a>
                 </div>
 
-                <!-- 3. Product Management -->
-                <div class="pt-2">
-                    <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Catalog & Materials</span>
+                <!-- SECTION 3: FORMS / CATALOG & MATERIALS -->
+                <div class="px-5 pt-4 pb-1.5 admin-sidebar-nav-heading">
+                    Forms
+                </div>
+
+                <div class="space-y-0.5">
+                    <!-- Products -->
                     <a href="{{ route('admin.products.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.products.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.products.*') ? 'is-active' : '' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ request()->routeIs('admin.products.*') ? 'text-blue-400' : 'text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            <i class="fa-solid fa-box-open w-4 text-center text-xs"></i>
                             <span>Products</span>
                         </div>
-                        @if($pendingProductsBadge > 0)
-                            <span class="bg-blue-100 text-blue-900 border border-blue-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full" title="{{ $pendingProductsBadge }} Pending Review">
-                                {{ $pendingProductsBadge }}
-                            </span>
-                        @endif
+                        <div class="flex items-center gap-1.5">
+                            @if($pendingProductsBadge > 0)
+                                <span class="bg-[#fe9365] text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-full" title="{{ $pendingProductsBadge }} Pending">
+                                    {{ $pendingProductsBadge }}
+                                </span>
+                            @else
+                                <span class="bg-[#01a9ac] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase">NEW</span>
+                            @endif
+                            <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
+                        </div>
                     </a>
 
                     <!-- Product Categories Link -->
                     <a href="{{ route('admin.product-categories.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2 rounded-xl font-medium transition-all duration-150 mt-0.5 {{ request()->routeIs('admin.product-categories.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
-                        <div class="flex items-center gap-3 pl-1">
-                            <svg class="w-3.5 h-3.5 {{ request()->routeIs('admin.product-categories.*') ? 'text-blue-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.product-categories.*') ? 'is-active' : '' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-shapes w-4 text-center text-xs"></i>
                             <span>Product Categories</span>
                         </div>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
                     </a>
                 </div>
 
-                <!-- 4. Author Management -->
-                <div class="pt-2">
-                    <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Community</span>
+                <!-- SECTION 4: TABLES / EDITORIAL & CMS -->
+                <div class="px-5 pt-4 pb-1.5 admin-sidebar-nav-heading">
+                    Tables
+                </div>
+
+                <div class="space-y-0.5">
+                    <!-- Authors -->
                     <a href="{{ route('admin.authors.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.authors.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.authors.*') ? 'is-active' : '' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ request()->routeIs('admin.authors.*') ? 'text-purple-400' : 'text-purple-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <i class="fa-solid fa-users-gear w-4 text-center text-xs"></i>
                             <span>Author Management</span>
                         </div>
+                        <span class="bg-[#fe5d70] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase">HOT</span>
                     </a>
-                </div>
 
-                <!-- 5. Page Create / CMS Pages -->
-                <div class="pt-2">
-                    <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Content CMS</span>
+                    <!-- Page Create / CMS Pages -->
                     <a href="{{ route('admin.pages.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.pages.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.pages.*') ? 'is-active' : '' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ request()->routeIs('admin.pages.*') ? 'text-amber-400' : 'text-amber-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <i class="fa-regular fa-file-lines w-4 text-center text-xs"></i>
                             <span>Page Create & Pages</span>
                         </div>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
+                    </a>
+
+                    <!-- Articles -->
+                    <div class="flex items-center justify-between px-5 py-2 font-medium admin-sidebar-link {{ request()->routeIs('admin.articles.*') ? 'is-active' : '' }}">
+                        <a href="{{ route('admin.articles.index') }}" class="flex items-center gap-3 flex-1">
+                            <i class="fa-regular fa-newspaper w-4 text-center text-xs"></i>
+                            <span>Articles</span>
+                        </a>
+                        <a href="{{ route('admin.articles.create') }}" title="Write New Article" class="p-1 rounded hover:bg-[#526380]/40 text-[#a0b1cc] hover:text-white transition-colors">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Architecture News -->
+                    <div class="flex items-center justify-between px-5 py-2 font-medium admin-sidebar-link {{ request()->routeIs('admin.news.*') ? 'is-active' : '' }}">
+                        <a href="{{ route('admin.news.index') }}" class="flex items-center gap-3 flex-1">
+                            <i class="fa-solid fa-bullhorn w-4 text-center text-xs"></i>
+                            <span>Architecture News</span>
+                        </a>
+                        <a href="{{ route('admin.news.create') }}" title="Post Architecture News" class="p-1 rounded hover:bg-[#526380]/40 text-[#a0b1cc] hover:text-white transition-colors">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Our Partners -->
+                    <a href="{{ route('admin.partners.index') }}"
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.partners.*') ? 'is-active' : '' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-handshake w-4 text-center text-xs"></i>
+                            <span>Our Partners</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
                     </a>
                 </div>
 
-                <!-- 6. Editorial CMS: Articles & Architecture News (Separated) -->
-                <div class="pt-3">
-                    <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Editorial & Journalism</span>
-                    
-                    <div class="space-y-1">
-                        <!-- Articles -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.articles.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
-                            <a href="{{ route('admin.articles.index') }}" class="flex items-center gap-3 flex-1">
-                                <svg class="w-4 h-4 {{ request()->routeIs('admin.articles.*') ? 'text-rose-400' : 'text-rose-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                                <span>Articles</span>
-                            </a>
-                            <a href="{{ route('admin.articles.create') }}" title="Write New Article" class="p-1 rounded-lg transition-colors {{ request()->routeIs('admin.articles.*') ? 'hover:bg-slate-800 text-rose-300' : 'hover:bg-slate-200 text-slate-500' }}">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            </a>
-                        </div>
-
-                        <!-- Architecture News -->
-                        <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.news.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
-                            <a href="{{ route('admin.news.index') }}" class="flex items-center gap-3 flex-1">
-                                <svg class="w-4 h-4 {{ request()->routeIs('admin.news.*') ? 'text-blue-400' : 'text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                <span>Architecture News</span>
-                            </a>
-                            <a href="{{ route('admin.news.create') }}" title="Post Architecture News" class="p-1 rounded-lg transition-colors {{ request()->routeIs('admin.news.*') ? 'hover:bg-slate-800 text-blue-300' : 'hover:bg-slate-200 text-slate-500' }}">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            </a>
-                        </div>
-                    </div>
+                <!-- SECTION 5: INQUIRIES & SETTINGS -->
+                <div class="px-5 pt-4 pb-1.5 admin-sidebar-nav-heading">
+                    Communications
                 </div>
 
-                <!-- 7. Inquiries -->
-                <div class="pt-2">
+                <div class="space-y-0.5">
+                    <!-- Product Inquiries -->
                     <a href="{{ route('admin.inquiries.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.inquiries.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.inquiries.*') ? 'is-active' : '' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ request()->routeIs('admin.inquiries.*') ? 'text-teal-400' : 'text-teal-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            <span>Product Inquiries</span>
+                            <i class="fa-regular fa-envelope w-4 text-center text-xs"></i>
+                            <span>Client Inquiries</span>
                         </div>
                         @if($newInquiriesBadge > 0)
-                            <span class="bg-teal-100 text-teal-900 border border-teal-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                            <span class="bg-[#01a9ac] text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-full">
                                 {{ $newInquiriesBadge }}
                             </span>
                         @endif
                     </a>
-                </div>
 
-                <!-- 8. Settings -->
-                <div class="pt-2">
+                    <!-- Settings & Status -->
                     <a href="{{ route('admin.settings.index') }}"
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 {{ request()->routeIs('admin.settings.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                       class="admin-sidebar-link flex items-center justify-between px-5 py-2.5 font-medium {{ request()->routeIs('admin.settings.*') ? 'is-active' : '' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ request()->routeIs('admin.settings.*') ? 'text-slate-300' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <i class="fa-solid fa-sliders w-4 text-center text-xs"></i>
                             <span>Settings & Status</span>
                         </div>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-[#71829e]"></i>
                     </a>
                 </div>
             </nav>
         </div>
 
-        <!-- Sidebar Footer / Admin Profile & Logout -->
-        <div class="px-6 pt-5 border-t border-slate-100">
+        <!-- Sidebar Footer / Admin Profile & Logout (Fixed at bottom) -->
+        <div class="admin-sidebar-footer px-5 py-3.5 flex-shrink-0">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-                        {{ strtoupper(substr(Auth::guard('admin')->user()->name ?? 'A', 0, 1)) }}
+                <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 group min-w-0" title="Click to Edit Profile">
+                    <img src="{{ Auth::guard('admin')->user()->avatar }}"
+                         alt="{{ Auth::guard('admin')->user()->name ?? 'Admin' }}"
+                         class="w-9 h-9 rounded-full object-cover border-2 border-[#526380] group-hover:border-[#fe5d70] transition-all">
+                    <div class="min-w-0">
+                        <span class="text-xs font-bold text-white block leading-tight truncate group-hover:text-[#fe5d70] transition-colors">{{ Auth::guard('admin')->user()->name ?? 'Administrator' }}</span>
+                        <span class="text-[10px] text-[#868e96] uppercase tracking-wider font-semibold">SUPER ADMIN</span>
                     </div>
-                    <div>
-                        <span class="text-xs font-bold text-slate-900 block leading-tight">{{ Auth::guard('admin')->user()->name ?? 'Administrator' }}</span>
-                        <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Super Admin</span>
-                    </div>
-                </div>
-                <form action="{{ route('admin.logout') }}" method="POST">
+                </a>
+                <form action="{{ route('admin.logout') }}" method="POST" class="shrink-0">
                     @csrf
-                    <button type="submit" class="text-xs text-rose-600 hover:text-rose-700 font-semibold p-1.5 hover:bg-rose-50 rounded-lg transition-colors" title="Sign Out">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <button type="submit" class="text-[#fe5d70] hover:text-white font-semibold p-1.5 hover:bg-[#fe5d70]/20 rounded-lg transition-colors cursor-pointer" title="Sign Out">
+                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
                     </button>
                 </form>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <a href="{{ route('home') }}" target="_blank" class="text-[11px] font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
+            <div class="mt-3 pt-2.5 border-t border-[#4a5874]/40 flex items-center justify-between">
+                <a href="{{ route('home') }}" target="_blank" class="text-[11px] font-medium text-[#8f9eb3] hover:text-white flex items-center gap-1.5 transition-colors">
                     <span>Open Public Magazine</span>
-                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-[#8f9eb3]"></i>
                 </a>
             </div>
         </div>
     </aside>
 
-    <!-- Main Admin Workspace (Crisp Off-White Canvas) -->
-    <main class="flex-grow admin-content p-4 sm:p-8 min-h-screen overflow-x-hidden">
-        <!-- Toast Alerts in Modern Light Tone -->
-        @if(session('success'))
-            <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-900 px-5 py-3.5 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs">✓</span>
-                    <span>{{ session('success') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-900 text-base font-bold">&times;</button>
-            </div>
-        @endif
-        @if(session('warning'))
-            <div class="mb-6 bg-amber-50 border border-amber-200 text-amber-900 px-5 py-3.5 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs">!</span>
-                    <span>{{ session('warning') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-amber-700 hover:text-amber-900 text-base font-bold">&times;</button>
-            </div>
-        @endif
-        @if($errors->any())
-            <div class="mb-6 bg-rose-50 border border-rose-200 text-rose-900 px-5 py-3.5 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold text-xs">✕</span>
-                    <span>{{ $errors->first() }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-rose-700 hover:text-rose-900 text-base font-bold">&times;</button>
-            </div>
-        @endif
+    <!-- ================= MAIN RIGHT COLUMN WITH TOP HEADER ================= -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-screen">
+        <!-- TOP HEADER -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-2.5 flex items-center justify-between shadow-2xs backdrop-blur-md bg-white/95">
+            <!-- Left Side: Search, Fullscreen, Control Room Status & Public Site Link -->
+            <div class="flex items-center gap-3">
+                <!-- Search Icon -->
+                <button type="button" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer" title="Quick Search">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </button>
+                <!-- Fullscreen Toggle Icon -->
+                <button type="button" onclick="if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { document.exitFullscreen(); }" class="hidden sm:inline-flex p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer" title="Toggle Fullscreen">
+                    <i class="fa-solid fa-expand text-xs"></i>
+                </button>
 
-        @yield('content')
-    </main>
+                <div class="h-4 w-px bg-slate-200 hidden sm:block"></div>
+
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="tracking-wide">Admin Control Room</span>
+                </div>
+                <span class="text-slate-300 hidden sm:inline">|</span>
+                <a href="{{ route('home') }}" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 font-medium transition-colors">
+                    <span>View Public Magazine</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+                </a>
+            </div>
+
+            <!-- Right Side: Header Quick Links & Admin Avatar with Dropdown -->
+            <div class="flex items-center gap-2.5">
+                <!-- Notifications Bell with Coral Badge (5) -->
+                <button type="button" class="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer" title="5 Notifications">
+                    <i class="fa-regular fa-bell text-sm"></i>
+                    <span class="absolute top-1 right-1 w-4 h-4 bg-[#fe5d70] text-white text-[9px] font-bold rounded-full flex items-center justify-center">5</span>
+                </button>
+
+                <!-- Messages Bubble with Cyan Badge (3) -->
+                <button type="button" class="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer" title="3 New Messages">
+                    <i class="fa-regular fa-comments text-sm"></i>
+                    <span class="absolute top-1 right-1 w-4 h-4 bg-[#01a9ac] text-white text-[9px] font-bold rounded-full flex items-center justify-center">3</span>
+                </button>
+
+                <!-- Settings Shortcut Button -->
+                <a href="{{ route('admin.settings.index') }}" title="Site & System Settings" class="hidden sm:flex p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors">
+                    <i class="fa-solid fa-gear text-sm"></i>
+                </a>
+
+                <!-- Admin Profile Dropdown Component -->
+                <div class="relative admin-dropdown-container">
+                    <button type="button"
+                            id="desktop-admin-dropdown-btn"
+                            onclick="toggleAdminDropdown('desktop-admin-dropdown-menu', 'desktop-admin-dropdown-arrow')"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            class="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-full sm:rounded-xl hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900/10 cursor-pointer border border-transparent hover:border-slate-200">
+                        <img src="{{ Auth::guard('admin')->user()->avatar }}"
+                             alt="{{ Auth::guard('admin')->user()->name ?? 'Admin' }}"
+                             class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-slate-200 shadow-2xs">
+                        <div class="hidden sm:block text-left">
+                            <span class="text-xs font-bold text-slate-900 block leading-tight">{{ Auth::guard('admin')->user()->name ?? 'Administrator' }}</span>
+                            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Super Admin</span>
+                        </div>
+                        <i id="desktop-admin-dropdown-arrow" class="admin-dropdown-arrow fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200 hidden sm:block"></i>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="desktop-admin-dropdown-menu"
+                         class="admin-dropdown-menu hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 transition-all duration-150 transform opacity-0 scale-95 origin-top-right">
+                        <!-- Dropdown Header -->
+                        <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
+                            <img src="{{ Auth::guard('admin')->user()->avatar }}"
+                                 alt="{{ Auth::guard('admin')->user()->name ?? 'Admin' }}"
+                                 class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-xs">
+                            <div class="min-w-0 flex-1">
+                                <div class="text-xs font-bold text-slate-900 truncate">{{ Auth::guard('admin')->user()->name ?? 'Administrator' }}</div>
+                                <div class="text-[11px] text-slate-400 truncate">{{ Auth::guard('admin')->user()->email ?? 'admin@editorial.com' }}</div>
+                                <span class="inline-block mt-1 text-[9px] font-extrabold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 px-1.5 py-0.2 rounded">SUPER ADMIN</span>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Navigation Links -->
+                        <div class="py-1 text-xs">
+                            <!-- 1. Edit Profile -->
+                            <a href="{{ route('admin.profile.edit') }}"
+                               class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors font-medium">
+                                <span class="w-8 h-8 rounded-lg bg-rose-50 text-[#fe5d70] flex items-center justify-center">
+                                    <i class="fa-solid fa-user-pen text-xs"></i>
+                                </span>
+                                <div>
+                                    <span class="font-bold block leading-tight text-slate-800">Edit Profile</span>
+                                    <span class="text-[10px] text-slate-400">Change name, email, avatar & password</span>
+                                </div>
+                            </a>
+
+                            <!-- 2. Settings -->
+                            <a href="{{ route('admin.settings.index') }}"
+                               class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors font-medium">
+                                <span class="w-8 h-8 rounded-lg bg-cyan-50 text-[#01a9ac] flex items-center justify-center">
+                                    <i class="fa-solid fa-sliders text-xs"></i>
+                                </span>
+                                <div>
+                                    <span class="font-bold block leading-tight text-slate-800">Settings</span>
+                                    <span class="text-[10px] text-slate-400">Branding, logo & site options</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="border-t border-slate-100 my-1"></div>
+
+                        <!-- 3. Logout -->
+                        <form action="{{ route('admin.logout') }}" method="POST" class="p-1">
+                            @csrf
+                            <button type="submit"
+                                    class="w-full flex items-center gap-3 px-3 py-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors font-semibold text-xs text-left cursor-pointer">
+                                <span class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                                </span>
+                                <span>Sign Out</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Admin Workspace (Crisp Off-White Canvas) -->
+        <main class="flex-grow admin-content p-4 sm:p-8 min-h-screen overflow-x-hidden">
+            <!-- Toast Alerts in Modern Light Tone -->
+            @if(session('success'))
+                <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-900 px-5 py-3.5 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs">✓</span>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-900 text-base font-bold">&times;</button>
+                </div>
+            @endif
+            @if(session('warning'))
+                <div class="mb-6 bg-amber-50 border border-amber-200 text-amber-900 px-5 py-3.5 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs">!</span>
+                        <span>{{ session('warning') }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-amber-700 hover:text-amber-900 text-base font-bold">&times;</button>
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="mb-6 bg-rose-50 border border-rose-200 text-rose-900 px-5 py-3.5 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold text-xs">✕</span>
+                        <span>{{ $errors->first() }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-rose-700 hover:text-rose-900 text-base font-bold">&times;</button>
+                </div>
+            @endif
+
+            @yield('content')
+        </main>
+    </div>
+
+    <!-- Dropdown Interaction Script -->
+    <script>
+        function toggleAdminDropdown(menuId, arrowId = null) {
+            const menu = document.getElementById(menuId);
+            const arrow = arrowId ? document.getElementById(arrowId) : null;
+            if (!menu) return;
+
+            const isHidden = menu.classList.contains('hidden');
+
+            // Close any other open dropdown menus first
+            document.querySelectorAll('.admin-dropdown-menu').forEach(otherMenu => {
+                if (otherMenu !== menu && !otherMenu.classList.contains('hidden')) {
+                    otherMenu.classList.remove('opacity-100', 'scale-100');
+                    otherMenu.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        otherMenu.classList.add('hidden');
+                    }, 150);
+                }
+            });
+            document.querySelectorAll('.admin-dropdown-arrow').forEach(otherArrow => {
+                if (otherArrow !== arrow) {
+                    otherArrow.classList.remove('rotate-180');
+                }
+            });
+
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    menu.classList.remove('opacity-0', 'scale-95');
+                    menu.classList.add('opacity-100', 'scale-100');
+                });
+                if (arrow) arrow.classList.add('rotate-180');
+            } else {
+                menu.classList.remove('opacity-100', 'scale-100');
+                menu.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    menu.classList.add('hidden');
+                }, 150);
+                if (arrow) arrow.classList.remove('rotate-180');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const containers = document.querySelectorAll('.admin-dropdown-container');
+            containers.forEach(container => {
+                if (!container.contains(event.target)) {
+                    const menu = container.querySelector('.admin-dropdown-menu');
+                    const arrow = container.querySelector('.admin-dropdown-arrow');
+                    if (menu && !menu.classList.contains('hidden')) {
+                        menu.classList.remove('opacity-100', 'scale-100');
+                        menu.classList.add('opacity-0', 'scale-95');
+                        setTimeout(() => {
+                            menu.classList.add('hidden');
+                        }, 150);
+                        if (arrow) arrow.classList.remove('rotate-180');
+                    }
+                }
+            });
+        });
+
+        // Close dropdown on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.admin-dropdown-menu').forEach(menu => {
+                    if (!menu.classList.contains('hidden')) {
+                        menu.classList.remove('opacity-100', 'scale-100');
+                        menu.classList.add('opacity-0', 'scale-95');
+                        setTimeout(() => {
+                            menu.classList.add('hidden');
+                        }, 150);
+                    }
+                });
+                document.querySelectorAll('.admin-dropdown-arrow').forEach(arrow => {
+                    arrow.classList.remove('rotate-180');
+                });
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>

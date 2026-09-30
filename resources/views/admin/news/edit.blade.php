@@ -7,15 +7,16 @@
 
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">News Desk</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Edit News: {{ $newsItem->title }}</h1>
-            <p class="text-xs text-slate-500 mt-1">Live URL: <a href="{{ route('news.show', $newsItem->slug) }}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline font-semibold">/news/{{ $newsItem->slug }} &nearr;</a></p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Edit News: {{ $newsItem->title }}</h1>
         </div>
-        <a href="{{ route('admin.news.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
-            <span>&larr; Back to News</span>
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('news.show', $newsItem->slug) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                <span>View Live &nearr;</span>
+            </a>
+            <a href="{{ route('admin.news.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
+                <span>&larr; Back to News</span>
+            </a>
+        </div>
     </div>
 
     <form action="{{ route('admin.news.update', $newsItem->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/90 shadow-sm text-xs">

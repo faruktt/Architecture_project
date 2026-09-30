@@ -8,16 +8,11 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">Taxonomy CMS</span>
-                <span class="text-xs text-slate-400 font-medium">Architecture</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Project Categories</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Manage architectural typology categories. These populate dynamically in project creation forms and frontend filters.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Project Categories</h1>
         </div>
         <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
-                Total Categories: {{ $categories->total() }}
+            <span class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-2xs">
+                Total: {{ $categories->total() }}
             </span>
         </div>
     </div>

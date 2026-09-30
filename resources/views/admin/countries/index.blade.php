@@ -8,16 +8,11 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">Regional Geography</span>
-                <span class="text-xs text-slate-400 font-medium">Architecture & Global Editions</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Countries Management</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Manage countries for architectural submissions. These appear dynamically in project submission dropdowns, filter bars, and homepage strips.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Countries Management</h1>
         </div>
         <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
-                Total Countries: {{ $countries->total() }}
+            <span class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-2xs">
+                Total: {{ $countries->total() }}
             </span>
         </div>
     </div>

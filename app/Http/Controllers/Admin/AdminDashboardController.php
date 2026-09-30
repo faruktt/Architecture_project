@@ -7,6 +7,9 @@ use App\Models\Project;
 use App\Models\Product;
 use App\Models\Author;
 use App\Models\Article;
+use App\Models\Country;
+use App\Models\ProjectCategory;
+use App\Models\ProductCategory;
 use App\Models\Page;
 use App\Models\ProductInquiry;
 use Illuminate\Support\Facades\Auth;
@@ -30,18 +33,22 @@ class AdminDashboardController extends Controller
             'total_pages' => Page::count(),
             'total_inquiries' => ProductInquiry::count(),
             'new_inquiries' => ProductInquiry::where('status', 'new')->count(),
+            'total_countries' => Country::count(),
+            'total_project_categories' => ProjectCategory::count(),
+            'total_product_categories' => ProductCategory::count(),
+            'total_categories' => ProjectCategory::count() + ProductCategory::count(),
         ];
 
         $pendingProjects = Project::with('author')
             ->where('status', 'pending')
             ->latest()
-            ->take(5)
+            ->take(3)
             ->get();
 
         $pendingProducts = Product::with('author')
             ->where('status', 'pending')
             ->latest()
-            ->take(5)
+            ->take(3)
             ->get();
 
         $recentAuthors = Author::latest()->take(5)->get();
@@ -51,6 +58,10 @@ class AdminDashboardController extends Controller
         $heroStoryProject = Project::where('is_hero_story', true)->first();
         $propertySellProductsCount = Product::where('is_property_sell', true)->count();
         $propertySellProducts = Product::where('is_property_sell', true)->latest()->take(2)->get();
+        $topCountries = Country::withCount('projects')
+            ->orderByDesc('projects_count')
+            ->take(5)
+            ->get();
 
         return view('admin.dashboard', compact(
             'admin',
@@ -62,7 +73,8 @@ class AdminDashboardController extends Controller
             'spotlightProject',
             'heroStoryProject',
             'propertySellProductsCount',
-            'propertySellProducts'
+            'propertySellProducts',
+            'topCountries'
         ));
     }
 }

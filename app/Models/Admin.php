@@ -31,4 +31,21 @@ class Admin extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Accessor for avatar to return public URL
+     * while database stores only the file name or external link.
+     */
+    public function getAvatarAttribute($value): string
+    {
+        if (!$value) {
+            return 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'Admin') . '&background=0f172a&color=fff';
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+
+        return asset('uploads/' . basename($value));
+    }
 }

@@ -1,6 +1,8 @@
 @php
     $siteLogo = \App\Models\Setting::logoUrl();
     $siteLogoText = \App\Models\Setting::logoText();
+    $siteFavicon = \App\Models\Setting::faviconUrl();
+    $siteTitle = \App\Models\Setting::siteTitle();
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -9,11 +11,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Author Workspace | ' . $siteLogoText . ' MAGAZINE')</title>
+    <title>@yield('title', 'Author Workspace | ' . $siteTitle)</title>
+    @if($siteFavicon)
+        <link rel="icon" type="image/x-icon" href="{{ $siteFavicon }}">
+        <link rel="shortcut icon" href="{{ $siteFavicon }}">
+        <link rel="apple-touch-icon" href="{{ $siteFavicon }}">
+    @endif
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -57,7 +67,7 @@
                             <div class="text-left">
                                 <span class="font-bold text-zinc-900 block leading-tight group-hover:underline flex items-center gap-1">
                                     {{ Auth::guard('author')->user()->name }}
-                                    <svg class="w-3 h-3 text-zinc-400 group-hover:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    <i class="fa-solid fa-pen text-[10px] text-zinc-400 group-hover:text-zinc-700"></i>
                                 </span>
                                 <span class="text-[10px] text-zinc-500">{{ Auth::guard('author')->user()->company ?? 'Architect' }}</span>
                             </div>
@@ -65,7 +75,9 @@
 
                         <form action="{{ route('author.logout') }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="text-zinc-500 hover:text-red-600 transition-colors p-1">Logout</button>
+                            <button type="submit" class="text-zinc-500 hover:text-red-600 transition-colors p-1 cursor-pointer" title="Sign Out">
+                                <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                            </button>
                         </form>
                     @endauth
                 </div>
@@ -78,11 +90,9 @@
                         </a>
                         <button type="button"
                                 onclick="document.getElementById('author-mobile-menu').classList.toggle('hidden')"
-                                class="p-2 text-zinc-700 hover:text-black hover:bg-zinc-100 rounded-lg transition-colors focus:outline-none"
+                                class="p-2 text-zinc-700 hover:text-black hover:bg-zinc-100 rounded-lg transition-colors focus:outline-none cursor-pointer"
                                 aria-label="Toggle Navigation Menu">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
+                            <i class="fa-solid fa-bars text-lg"></i>
                         </button>
                     @endauth
                 </div>

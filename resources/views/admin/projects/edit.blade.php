@@ -7,11 +7,7 @@
 
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">Project Editorial Review</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Review & Edit Architectural Project</h1>
-            <p class="text-xs text-slate-500 mt-1">Admin review portal: Edit any fields submitted by the author and decide publication status.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Edit Project</h1>
         </div>
         <a href="{{ route('admin.projects.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
             <span>&larr; Back to Projects</span>
@@ -120,52 +116,89 @@
                 <input type="text" name="subtitle" value="{{ old('subtitle', $project->subtitle) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Category *</label>
-                    <select name="category" required class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
-                        @foreach($categories as $cat)
-                            <option value="{{ $cat }}" {{ old('category', $project->category) === $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Country *</label>
-                    <select name="country" required class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
-                        @foreach($countries as $cnt)
-                            <option value="{{ $cnt }}" {{ old('country', $project->country) === $cnt ? 'selected' : '' }}>{{ $cnt }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">City / Location</label>
-                    <input type="text" name="city" value="{{ old('city', $project->city) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
-                </div>
-            </div>
+            <!-- Project Specifications (11 Key Attributes) -->
+            <div class="pt-4 border-t border-slate-200">
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">Project Specifications</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 1. Lead Architects -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Lead Architects</label>
+                        <input type="text" name="lead_architects" value="{{ old('lead_architects', $project->lead_architects) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. Ar. Tariq Ahmed, Atelier Studio">
+                    </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Year</label>
-                    <input type="text" name="year" value="{{ old('year', $project->year) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Gross Area</label>
-                    <input type="text" name="area" value="{{ old('area', $project->area) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Architects / Firm</label>
-                    <input type="text" name="architects" value="{{ old('architects', $project->architects) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
-                </div>
-            </div>
+                    <!-- 2. Associate -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Associate</label>
+                        <input type="text" name="associate" value="{{ old('associate', $project->associate) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. Associate Architects">
+                    </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Lead Architects</label>
-                    <input type="text" name="lead_architects" value="{{ old('lead_architects', $project->lead_architects) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1.5">Manufacturers & Materials</label>
-                    <input type="text" name="manufacturers" value="{{ old('manufacturers', $project->manufacturers) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all">
+                    <!-- 3. Area -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Area</label>
+                        <input type="text" name="area" value="{{ old('area', $project->area) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="000 m²">
+                    </div>
+
+                    <!-- 4. Build Year -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Build Year</label>
+                        <input type="text" name="build_year" value="{{ old('build_year', $project->build_year ?? $project->year) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. 2024">
+                    </div>
+
+                    <!-- 5. Photographer -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Photographer</label>
+                        <input type="text" name="photographer" value="{{ old('photographer', $project->photographer) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. Iwan Baan">
+                    </div>
+
+                    <!-- 6. Category -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Category *</label>
+                        <select name="category" required class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs">
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat }}" {{ old('category', $project->category) === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- 7. Illustrations -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Illustrations</label>
+                        <input type="text" name="illustrations" value="{{ old('illustrations', $project->illustrations) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. Drawing / Diagram Credits">
+                    </div>
+
+                    <!-- 8. City -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">City</label>
+                        <input type="text" name="city" value="{{ old('city', $project->city) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. Bali, Dhaka, Kuala Lumpur">
+                    </div>
+
+                    <!-- 9. Country -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Country *</label>
+                        <select name="country" required class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs">
+                            @foreach($countries as $cnt)
+                                <option value="{{ $cnt }}" {{ old('country', $project->country) === $cnt ? 'selected' : '' }}>{{ $cnt }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- 10. Phone Number -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
+                        <input type="text" name="phone_number" value="{{ old('phone_number', $project->phone_number) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. +60 12-345 6789">
+                    </div>
+
+                    <!-- 11. Web address -->
+                    <div class="sm:col-span-2">
+                        <label class="block font-semibold text-slate-700 mb-1">Web address</label>
+                        <input type="url" name="web_address" value="{{ old('web_address', $project->web_address) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs font-mono text-[11px]" placeholder="https://www.architectstudio.com">
+                    </div>
+
+                    <!-- Optional Sell Price -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Listing Price (Optional for sell post)</label>
+                        <input type="text" name="price" value="{{ old('price', $project->price) }}" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none transition-all text-xs" placeholder="e.g. $1,200,000">
+                    </div>
                 </div>
             </div>
 

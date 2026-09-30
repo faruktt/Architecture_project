@@ -7,15 +7,16 @@
 
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">CMS Editor</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Edit CMS Page: {{ $page->title }}</h1>
-            <p class="text-xs text-slate-500 mt-1">Live URL: <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline font-semibold">/page/{{ $page->slug }} &nearr;</a></p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Edit Page: {{ $page->title }}</h1>
         </div>
-        <a href="{{ route('admin.pages.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
-            <span>&larr; Back to Pages</span>
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                <span>View Live &nearr;</span>
+            </a>
+            <a href="{{ route('admin.pages.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
+                <span>&larr; Back to Pages</span>
+            </a>
+        </div>
     </div>
 
     <form action="{{ route('admin.pages.update', $page->id) }}" method="POST" class="space-y-6 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/90 shadow-sm text-xs">

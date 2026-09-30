@@ -58,23 +58,91 @@
         <img src="{{ $project->featured_image }}" alt="{{ $project->title }}" class="w-full max-h-[600px] object-cover">
     </div>
 
-    <!-- Metadata Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-zinc-50 border border-zinc-200 rounded mb-10 text-xs">
-        <div>
-            <span class="block text-zinc-400 font-medium uppercase text-[10px]">Location</span>
-            <strong class="text-zinc-800 text-sm">{{ $project->city ?? $project->country }}</strong>
+    <!-- ================= ARCHITECTURAL PROJECT SPECIFICATIONS (ArchDaily Style) ================= -->
+    <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-5 sm:p-7 mb-12 shadow-2xs">
+        <div class="flex items-center justify-between border-b border-zinc-200 pb-3 mb-5">
+            <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-zinc-500 flex items-center gap-2">
+                <i class="fa-solid fa-compass-drafting text-zinc-700"></i>
+                <span>Project Specifications</span>
+            </h3>
+            <span class="text-[11px] font-semibold text-zinc-500 bg-white border border-zinc-200 px-2.5 py-0.5 rounded-full">{{ $project->category }}</span>
         </div>
-        <div>
-            <span class="block text-zinc-400 font-medium uppercase text-[10px]">Year Built</span>
-            <strong class="text-zinc-800 text-sm">{{ $project->year ?? '2024' }}</strong>
-        </div>
-        <div>
-            <span class="block text-zinc-400 font-medium uppercase text-[10px]">Gross Area</span>
-            <strong class="text-zinc-800 text-sm">{{ $project->area ?? '450 m²' }}</strong>
-        </div>
-        <div>
-            <span class="block text-zinc-400 font-medium uppercase text-[10px]">Typology</span>
-            <strong class="text-zinc-800 text-sm">{{ $project->category }}</strong>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-5 gap-x-6 text-xs">
+            @if($project->lead_architects)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Lead Architects</span>
+                    <strong class="text-zinc-900 font-bold block mt-0.5 text-xs leading-snug">{{ $project->lead_architects }}</strong>
+                </div>
+            @endif
+
+            @if($project->associate)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Associate</span>
+                    <span class="text-zinc-800 font-medium block mt-0.5 leading-snug">{{ $project->associate }}</span>
+                </div>
+            @endif
+
+            @if($project->area)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Area</span>
+                    <strong class="text-zinc-900 font-bold block mt-0.5">{{ $project->area }}</strong>
+                </div>
+            @endif
+
+            @if($project->build_year ?? $project->year)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Build Year</span>
+                    <strong class="text-zinc-900 font-bold block mt-0.5">{{ $project->build_year ?? $project->year }}</strong>
+                </div>
+            @endif
+
+            @if($project->photographer)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Photographer</span>
+                    <span class="text-zinc-800 font-medium block mt-0.5">{{ $project->photographer }}</span>
+                </div>
+            @endif
+
+            <div>
+                <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Category</span>
+                <span class="text-zinc-800 font-medium block mt-0.5">{{ $project->category }}</span>
+            </div>
+
+            @if($project->illustrations)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Illustrations</span>
+                    <span class="text-zinc-800 font-medium block mt-0.5">{{ $project->illustrations }}</span>
+                </div>
+            @endif
+
+            @if($project->city || $project->country)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Location</span>
+                    <span class="text-zinc-800 font-medium block mt-0.5">
+                        {{ implode(', ', array_filter([$project->city, $project->country])) }}
+                    </span>
+                </div>
+            @endif
+
+            @if($project->phone_number)
+                <div>
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Phone Number</span>
+                    <a href="tel:{{ $project->phone_number }}" class="text-zinc-800 hover:text-black font-medium block mt-0.5 font-mono text-[11px]">
+                        {{ $project->phone_number }}
+                    </a>
+                </div>
+            @endif
+
+            @if($project->web_address)
+                <div class="sm:col-span-2">
+                    <span class="block text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">Web Address</span>
+                    <a href="{{ $project->web_address }}" target="_blank" rel="noopener noreferrer" class="text-zinc-900 hover:text-black font-semibold inline-flex items-center gap-1.5 mt-0.5 underline font-mono text-[11px]">
+                        <span class="truncate max-w-[280px]">{{ $project->web_address }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-zinc-400"></i>
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
 

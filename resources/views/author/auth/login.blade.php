@@ -1,18 +1,28 @@
 @php
     $siteLogo = \App\Models\Setting::logoUrl();
     $siteLogoText = \App\Models\Setting::logoText();
+    $siteFavicon = \App\Models\Setting::faviconUrl();
+    $siteTitle = \App\Models\Setting::siteTitle();
     $showcaseProject = \App\Models\Project::where('status', 'approved')
         ->whereNotNull('featured_image')
         ->latest()
+        ->skip(1)
         ->first()
+        ?? \App\Models\Project::where('status', 'approved')->whereNotNull('featured_image')->first()
         ?? \App\Models\Project::whereNotNull('featured_image')->first();
+    $activeCountries = \App\Models\Country::active()->orderBy('name')->get();
 @endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Author Login | {{ $siteLogoText }}</title>
+    <title>Author Login | {{ $siteTitle }}</title>
+    @if($siteFavicon)
+        <link rel="icon" type="image/x-icon" href="{{ $siteFavicon }}">
+        <link rel="shortcut icon" href="{{ $siteFavicon }}">
+        <link rel="apple-touch-icon" href="{{ $siteFavicon }}">
+    @endif
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,21 +49,7 @@
     @endif
 
     <!-- Top Navigation -->
-    <header class="relative z-10 w-full max-w-5xl mx-auto flex items-center justify-between py-2">
-        <a href="{{ route('home') }}" class="flex items-center gap-2 text-white">
-            @if($siteLogo)
-                <img src="{{ $siteLogo }}" alt="{{ $siteLogoText }}" class="h-7 max-w-[130px] object-contain brightness-0 invert">
-            @else
-                <span class="text-xl font-black tracking-tight text-white site-cinzel lowercase">{{ $siteLogoText }}</span>
-            @endif
-            <span class="text-[9px] font-bold uppercase tracking-widest bg-white/20 text-white px-2 py-0.5 rounded backdrop-blur">Studio</span>
-        </a>
 
-        <a href="{{ route('home') }}" class="text-xs font-semibold text-white/80 hover:text-white transition-colors flex items-center gap-1.5 bg-black/30 hover:bg-black/50 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur">
-            <span>&larr;</span>
-            <span>Back to Magazine</span>
-        </a>
-    </header>
 
     <!-- Centered Login Card -->
     <main class="relative z-10 w-full max-w-md mx-auto my-auto py-6">
@@ -135,7 +131,7 @@
                     <button type="submit"
                             class="w-full py-3 px-5 bg-black hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                         <span>Sign In</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+
                     </button>
                 </div>
             </form>
@@ -145,34 +141,16 @@
                 <p class="text-xs text-zinc-600">
                     Don't have an author profile?
                     <a href="{{ route('author.register') }}" class="font-bold text-black hover:underline ml-1">
-                        Register Here &rarr;
+                        Register Here
                     </a>
                 </p>
-                <div>
-                    <a href="{{ route('admin.login') }}" class="text-[11px] text-zinc-400 hover:text-zinc-700 transition-colors">
-                        Admin Login &rarr;
-                    </a>
-                </div>
+
             </div>
 
         </div>
     </main>
 
-    <!-- Footer Attribution -->
-    <footer class="relative z-10 w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-white/70 py-2 gap-2">
-        <div>
-            @if($showcaseProject)
-                <span>Featured Architecture: <strong>{{ $showcaseProject->title }}</strong></span>
-                @if($showcaseProject->country)
-                    <span class="text-white/40">&bull;</span>
-                    <span>{{ $showcaseProject->country }}</span>
-                @endif
-            @endif
-        </div>
-        <div>
-            <span>&copy; {{ date('Y') }} {{ $siteLogoText }} MAGAZINE</span>
-        </div>
-    </footer>
+
 
     <script>
         function togglePassword(inputId, iconId) {

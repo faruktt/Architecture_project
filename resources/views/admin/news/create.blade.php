@@ -7,11 +7,7 @@
 
     <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">News Desk</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Post Architecture News</h1>
-            <p class="text-xs text-slate-500 mt-1">Publish architectural breaking news, events, video reports, and triennials.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Post News</h1>
         </div>
         <a href="{{ route('admin.news.index') }}" class="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 transition-colors">
             <span>&larr; Back to News</span>

@@ -45,6 +45,31 @@ class Setting extends Model
     }
 
     /**
+     * Get the configured browser site title.
+     */
+    public static function siteTitle(): string
+    {
+        return static::get('site_title') ?: (static::logoText() . ' MAGAZINE | Interior • Architecture • Lifestyle');
+    }
+
+    /**
+     * Get the formatted site favicon URL or null if not set.
+     */
+    public static function faviconUrl(): ?string
+    {
+        $favicon = static::get('site_favicon');
+        if (!$favicon) {
+            return null;
+        }
+
+        if (str_starts_with($favicon, 'http://') || str_starts_with($favicon, 'https://')) {
+            return $favicon;
+        }
+
+        return asset('uploads/' . basename($favicon));
+    }
+
+    /**
      * Supported social media platforms with their display names, placeholders, and SVGs.
      */
     public static function supportedSocialPlatforms(): array

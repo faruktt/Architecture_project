@@ -8,18 +8,28 @@
     @php
         $siteLogo = \App\Models\Setting::logoUrl();
         $siteLogoText = \App\Models\Setting::logoText();
+        $siteFavicon = \App\Models\Setting::faviconUrl();
+        $siteTitle = \App\Models\Setting::siteTitle();
         if (!isset($navCountries) || empty($navCountries) || (is_object($navCountries) && $navCountries->isEmpty())) {
             $navCountries = \App\Models\Country::active()->orderBy('order')->orderBy('name')->get();
         }
     @endphp
 
-    <title>@yield('title', $siteLogoText . ' MAGAZINE | Interior • Architecture • Lifestyle')</title>
+    <title>@yield('title', $siteTitle)</title>
+    @if($siteFavicon)
+        <link rel="icon" type="image/x-icon" href="{{ $siteFavicon }}">
+        <link rel="shortcut icon" href="{{ $siteFavicon }}">
+        <link rel="apple-touch-icon" href="{{ $siteFavicon }}">
+    @endif
     <meta name="description" content="@yield('meta_description', 'International architectural and interior showcase, featuring curated projects, building products, and editorial narratives across Asia and the world.')">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Tailwind & App Assets -->
     @if (file_exists(public_path('build/manifest.json')))
@@ -132,7 +142,38 @@
                     @auth('admin')
                         <a href="{{ route('admin.dashboard') }}" class="font-bold text-zinc-900 hover:underline">Admin Panel</a>
                     @elseauth('author')
-                        <a href="{{ route('author.dashboard') }}" class="font-bold text-zinc-900 hover:underline">Author Studio</a>
+                        @php
+                            $headerAuthor = Auth::guard('author')->user();
+                        @endphp
+                        <div class="relative group">
+                            <a href="{{ route('author.dashboard') }}" class="flex items-center gap-2.5 text-left hover:opacity-90 transition-opacity">
+                                <img src="{{ $headerAuthor->avatar }}"
+                                     alt="{{ $headerAuthor->name }}"
+                                     class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-zinc-200 shadow-2xs">
+                                <div class="flex flex-col justify-center leading-tight">
+                                    <span class="text-xs sm:text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                        {{ $headerAuthor->name }}
+                                    </span>
+                                    <span class="text-[10px] sm:text-[11px] font-medium text-sky-700">
+                                        {{ $headerAuthor->company ?: ($headerAuthor->title ?: 'Author') }}
+                                    </span>
+                                </div>
+                            </a>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-zinc-200 py-2 hidden group-hover:block z-50 text-xs">
+                                <div class="px-4 py-2 border-b border-zinc-100">
+                                    <p class="font-bold text-zinc-900 truncate">{{ $headerAuthor->name }}</p>
+                                    <p class="text-[10px] text-zinc-400 truncate">{{ $headerAuthor->email }}</p>
+                                </div>
+                                <a href="{{ route('author.dashboard') }}" class="block px-4 py-2 hover:bg-zinc-50 font-medium">Dashboard</a>
+                                <a href="{{ route('author.projects.create') }}" class="block px-4 py-2 hover:bg-zinc-50 text-emerald-700 font-medium">+ Submit Project</a>
+                                <a href="{{ route('author.products.create') }}" class="block px-4 py-2 hover:bg-zinc-50 text-blue-700 font-medium">+ Submit Product</a>
+                                <div class="border-t border-zinc-100 my-1"></div>
+                                <form action="{{ route('author.logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50 font-medium">Logout</button>
+                                </form>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('author.login') }}" class="text-zinc-800 hover:text-black font-medium transition-colors">Log in</a>
                         <a href="{{ route('author.register') }}" class="bg-black hover:bg-zinc-800 text-white px-2.5 py-1 font-bold text-xs transition-colors">Sign Up</a>
@@ -141,7 +182,7 @@
             </div>
 
             <!-- Row 2: Large Central Logo Section -->
-            <div class="text-center py-8 bg-white border-t border-zinc-100">
+            <div class="text-center bg-white border-t border-zinc-100">
                 <a href="{{ route('home') }}" class="inline-block group">
                     @if($siteLogo)
                         <img src="{{ $siteLogo }}" alt="{{ $siteLogoText }}" class="h-16 md:h-20 max-w-[280px] mx-auto object-contain">
@@ -150,12 +191,7 @@
                             <span class="text-6xl md:text-7xl font-black tracking-tight text-black nook-logo-text lowercase" style="font-family: 'Cinzel', serif;">{{ $siteLogoText }}</span>
                         </div>
                     @endif
-                    <div class="text-[12px] font-bold tracking-[0.45em] text-zinc-900 mt-2 uppercase">
-                        MAGAZINE
-                    </div>
-                    <div class="text-[9px] font-medium tracking-[0.25em] text-zinc-500 mt-1 uppercase">
-                        INTERIOR &nbsp;&bull;&nbsp; ARCHITECTURE &nbsp;&bull;&nbsp; LIFESTYLE
-                    </div>
+
                 </a>
             </div>
 
@@ -204,17 +240,19 @@
                 <div class="flex-grow max-w-xl">
                     <form action="{{ route('search') }}" method="GET" class="relative flex items-center">
                         <div class="relative w-full">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <span class="absolute inset-y-0 left-0 pl-3.5 hidden sm:flex items-center pointer-events-none text-zinc-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
                             </span>
                             <input type="text"
                                    name="q"
                                    value="{{ request('q') }}"
-                                   placeholder="Search {{ $siteLogoText }}..."
-                                   class="w-full pl-9 sm:pl-10 pr-14 sm:pr-20 py-1.5 sm:py-2 text-xs md:text-sm bg-zinc-100 hover:bg-zinc-100/80 focus:bg-white text-zinc-900 rounded-md border border-transparent focus:border-zinc-300 focus:outline-none transition-all placeholder:text-zinc-500 font-normal">
+                                   placeholder="Search..."
+                                   class="w-full pl-3 sm:pl-10 pr-9 sm:pr-20 py-1.5 sm:py-2 text-xs md:text-sm bg-zinc-100 hover:bg-zinc-100/80 focus:bg-white text-zinc-900 rounded-md border border-transparent focus:border-zinc-300 focus:outline-none transition-all placeholder:text-zinc-500 font-normal">
                             <button type="submit"
-                                    class="absolute inset-y-1 right-1 px-2.5 sm:px-3 bg-zinc-800 hover:bg-black text-white text-[10px] sm:text-[11px] font-bold rounded flex items-center gap-1 transition-colors">
-                                <span>Search</span>
+                                    class="absolute inset-y-1 right-1 px-2.5 sm:px-3 bg-zinc-800 hover:bg-black text-white text-[10px] sm:text-[11px] font-bold rounded flex items-center justify-center gap-1.5 transition-colors"
+                                    title="Search">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                <span class="hidden sm:inline">Search</span>
                             </button>
                         </div>
                     </form>
@@ -248,9 +286,16 @@
                             A
                         </a>
                     @elseauth('author')
+                        @php
+                            $stickyAuthor = Auth::guard('author')->user();
+                        @endphp
                         <div class="relative group">
-                            <a href="{{ route('author.dashboard') }}" class="flex items-center gap-1.5">
-                                <img src="{{ Auth::guard('author')->user()->avatar }}" class="w-8 h-8 rounded-full object-cover border border-zinc-300 shadow-2xs">
+                            <a href="{{ route('author.dashboard') }}" class="flex items-center gap-2 text-left hover:opacity-90 transition-opacity">
+                                <img src="{{ $stickyAuthor->avatar }}" alt="{{ $stickyAuthor->name }}" class="w-8 h-8 rounded-full object-cover border border-zinc-300 shadow-2xs">
+                                <div class="hidden sm:flex flex-col justify-center leading-tight">
+                                    <span class="text-xs font-bold text-zinc-900 truncate max-w-[130px] leading-tight">{{ $stickyAuthor->name }}</span>
+                                    <span class="text-[10px] font-medium text-sky-700 truncate max-w-[130px] leading-tight">{{ $stickyAuthor->company ?: ($stickyAuthor->title ?: 'Author') }}</span>
+                                </div>
                             </a>
                             <div class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-xl border border-zinc-200 py-2 hidden group-hover:block z-50 text-xs">
                                 <div class="px-4 py-2 border-b border-zinc-100">
@@ -274,8 +319,8 @@
                     @endauth
 
                     <!-- Mobile Menu Hamburger Button -->
-                    <button type="button" onclick="document.getElementById('mobile-drawer').classList.toggle('hidden')" class="p-1.5 text-zinc-600 hover:text-black">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <button type="button" onclick="document.getElementById('mobile-drawer').classList.toggle('hidden')" class="p-2 text-zinc-600 hover:text-black lg:hidden" aria-label="Toggle Navigation Menu">
+                        <i class="fa-solid fa-bars text-lg"></i>
                     </button>
                 </div>
             </div>
@@ -317,7 +362,16 @@
             <div class="pt-2 border-t border-zinc-100 flex items-center justify-between">
                 <a href="{{ route('author.projects.create') }}" class="text-emerald-700 font-bold">Submit Your Project</a>
                 @auth('author')
-                    <a href="{{ route('author.dashboard') }}" class="text-zinc-800 font-bold">Author Studio &rarr;</a>
+                    @php
+                        $mobileAuthor = Auth::guard('author')->user();
+                    @endphp
+                    <a href="{{ route('author.dashboard') }}" class="flex items-center gap-2">
+                        <img src="{{ $mobileAuthor->avatar }}" alt="{{ $mobileAuthor->name }}" class="w-7 h-7 rounded-full object-cover border border-zinc-200">
+                        <div class="flex flex-col text-left leading-tight">
+                            <span class="text-xs font-bold text-zinc-900">{{ $mobileAuthor->name }}</span>
+                            <span class="text-[10px] font-medium text-sky-700">{{ $mobileAuthor->company ?: 'Author' }}</span>
+                        </div>
+                    </a>
                 @else
                     <a href="{{ route('author.login') }}" class="text-zinc-800 font-bold">Architect Log In</a>
                     <a href="{{ route('author.register') }}" class="bg-black text-white px-3 py-1.5 rounded font-bold">Sign Up</a>
@@ -336,74 +390,111 @@
     <footer class="bg-white border-t border-zinc-200 mt-20 pt-16 pb-12">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- OUR PARTNERS SECTION (Exact Replica from Screenshot) -->
-            <div class="text-center mb-14">
+            <!-- ================= OUR PARTNERS SECTION (Dynamic & Admin Controlled) ================= -->
+            @php
+                $partnersList = \App\Models\Partner::active()->get();
+            @endphp
+
+            @if($partnersList->isNotEmpty())
+            <div id="partners" class="text-center mb-14">
                 <span class="text-[11px] font-extrabold uppercase tracking-[0.25em] text-zinc-500 block mb-8">
                     OUR PARTNERS
                 </span>
 
-                <!-- Partner Logos Strip -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center opacity-85 hover:opacity-100 transition-opacity">
+                @if($partnersList->count() <= 6)
+                    <!-- Partner Logos Strip (Exact layout from user screenshot for <= 6 items) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 sm:gap-10 items-center justify-items-center opacity-85 hover:opacity-100 transition-opacity">
+                        @foreach($partnersList as $partner)
+                            @if($partner->url)
+                                <a href="{{ $partner->url }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="group flex items-center justify-center p-2 rounded-lg transition-transform hover:scale-105"
+                                   title="{{ $partner->name }} (Opens in new window)">
+                                    <img src="{{ $partner->logo_url }}"
+                                         alt="{{ $partner->name }}"
+                                         class="h-8 sm:h-9 max-w-[160px] object-contain transition-opacity duration-200 group-hover:opacity-100">
+                                </a>
+                            @else
+                                <div class="flex items-center justify-center p-2" title="{{ $partner->name }}">
+                                    <img src="{{ $partner->logo_url }}"
+                                         alt="{{ $partner->name }}"
+                                         class="h-8 sm:h-9 max-w-[160px] object-contain">
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @else
+                    <!-- Sliding Horizontal Marquee when partners > 6 (Bese hole side a slide hobe) -->
+                    <div class="relative overflow-hidden w-full partner-marquee-container group py-2">
+                        <!-- Fade Gradient Edges for Magazine Aesthetic -->
+                        <div class="absolute left-0 inset-y-0 w-12 sm:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+                        <div class="absolute right-0 inset-y-0 w-12 sm:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-                    <!-- 1. HOLCIM FOUNDATION -->
-                    <div class="flex items-center gap-2 group cursor-pointer">
-                        <svg class="w-8 h-8 text-zinc-900" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L4 7v10l8 5 8-5V7l-8-5zm0 2.3l5.5 3.4-5.5 3.5-5.5-3.5L12 4.3zM6 8.9l5 3.2v6.4l-5-3.1V8.9zm12 6.5l-5 3.1v-6.4l5-3.2v6.5z"/>
-                        </svg>
-                        <div class="text-left">
-                            <strong class="text-xs font-black text-zinc-900 tracking-wider block leading-tight">HOLCIM</strong>
-                            <span class="text-[9px] font-bold uppercase tracking-tight text-zinc-700 block leading-tight">FOUNDATION</span>
-                            <span class="text-[7px] text-zinc-500 block uppercase leading-none">SUSTAINABLE CONSTRUCTION</span>
+                        <!-- Infinite Sliding Track -->
+                        <div class="partner-marquee-track flex items-center gap-12 sm:gap-16">
+                            <!-- Loop 1 -->
+                            @foreach($partnersList as $partner)
+                                @if($partner->url)
+                                    <a href="{{ $partner->url }}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="shrink-0 flex items-center justify-center p-2 group transition-transform hover:scale-110"
+                                       title="{{ $partner->name }} (Opens in new window)">
+                                        <img src="{{ $partner->logo_url }}"
+                                             alt="{{ $partner->name }}"
+                                             class="h-8 sm:h-9 max-w-[160px] object-contain opacity-85 group-hover:opacity-100 transition-all duration-200">
+                                    </a>
+                                @else
+                                    <div class="shrink-0 flex items-center justify-center p-2" title="{{ $partner->name }}">
+                                        <img src="{{ $partner->logo_url }}"
+                                             alt="{{ $partner->name }}"
+                                             class="h-8 sm:h-9 max-w-[160px] object-contain opacity-85">
+                                    </div>
+                                @endif
+                            @endforeach
+
+                            <!-- Loop 2 (For seamless continuous marquee) -->
+                            @foreach($partnersList as $partner)
+                                @if($partner->url)
+                                    <a href="{{ $partner->url }}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="shrink-0 flex items-center justify-center p-2 group transition-transform hover:scale-110"
+                                       title="{{ $partner->name }} (Opens in new window)">
+                                        <img src="{{ $partner->logo_url }}"
+                                             alt="{{ $partner->name }}"
+                                             class="h-8 sm:h-9 max-w-[160px] object-contain opacity-85 group-hover:opacity-100 transition-all duration-200">
+                                    </a>
+                                @else
+                                    <div class="shrink-0 flex items-center justify-center p-2" title="{{ $partner->name }}">
+                                        <img src="{{ $partner->logo_url }}"
+                                             alt="{{ $partner->name }}"
+                                             class="h-8 sm:h-9 max-w-[160px] object-contain opacity-85">
+                                    </div>
+                                @endif
+                            @endforeach
                         </div>
                     </div>
-
-                    <!-- 2. WORLD ARCHITECTURE FESTIVAL -->
-                    <div class="flex items-center gap-2 group cursor-pointer">
-                        <div class="w-8 h-8 bg-zinc-900 text-white rounded flex items-center justify-center font-black text-xs">
-                            W
-                        </div>
-                        <div class="text-left">
-                            <span class="text-[10px] text-zinc-500 uppercase leading-none block">World Architecture</span>
-                            <span class="text-[9px] text-zinc-700 font-bold uppercase leading-none block">Festival</span>
-                        </div>
-                    </div>
-
-                    <!-- 3. UIA (Union Internationale des Architectes) -->
-                    <div class="flex items-center group cursor-pointer">
-                        <span class="text-3xl font-black text-zinc-900 tracking-tighter" style="font-family: sans-serif;">uia<span class="text-zinc-600 font-bold">&gt;</span></span>
-                    </div>
-
-                    <!-- 4. UN-HABITAT -->
-                    <div class="flex items-center gap-2 group cursor-pointer">
-                        <svg class="w-8 h-8 text-zinc-900" viewBox="0 0 24 24" fill="currentColor">
-                            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M12 4a8 8 0 100 16 8 8 0 000-16zm-1 2.2a6 6 0 012 0v3.6a6 6 0 01-2 0V6.2zm-4.3 2.5a6 6 0 011.4-1.4l2.5 2.6a6 6 0 01-1.4 1.4L6.7 8.7zm0 6.6l2.5-2.6a6 6 0 011.4 1.4L8.1 16.7a6 6 0 01-1.4-1.4zM12 17.8a6 6 0 01-2 0v-3.6a6 6 0 012 0v3.6zm4.3-2.5a6 6 0 01-1.4 1.4l-2.5-2.6a6 6 0 011.4-1.4l2.5 2.6zm0-6.6l-2.5 2.6a6 6 0 01-1.4-1.4l2.5-2.6a6 6 0 011.4 1.4z"/>
-                        </svg>
-                        <div class="text-left">
-                            <strong class="text-[11px] font-black tracking-wider text-zinc-900 block leading-tight">UN-HABITAT</strong>
-                            <span class="text-[8px] text-zinc-500 uppercase leading-none block">FOR A BETTER URBAN FUTURE</span>
-                        </div>
-                    </div>
-
-                    <!-- 5. OBEL AWARD -->
-                    <div class="text-center group cursor-pointer">
-                        <strong class="text-base font-black tracking-widest text-zinc-900 block" style="font-family: 'Cinzel', serif;">OBEL</strong>
-                        <span class="text-[10px] font-bold tracking-[0.25em] text-zinc-700 block uppercase">AWARD</span>
-                    </div>
-
-                    <!-- 6. EUROPEAN CULTURAL CENTRE -->
-                    <div class="flex items-center gap-2 group cursor-pointer">
-                        <div class="w-8 h-8 rounded-full border border-zinc-900 flex items-center justify-center text-[7px] font-black uppercase text-center leading-none p-1">
-                            ECC
-                        </div>
-                        <div class="text-left">
-                            <strong class="text-[10px] font-bold uppercase text-zinc-900 block leading-tight">European</strong>
-                            <span class="text-[9px] text-zinc-700 block leading-tight">Cultural Centre</span>
-                        </div>
-                    </div>
-
-                </div>
+                @endif
             </div>
+
+            <style>
+                @keyframes partnerSlideMarquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .partner-marquee-track {
+                    display: flex;
+                    width: max-content;
+                    animation: partnerSlideMarquee 30s linear infinite;
+                    will-change: transform;
+                }
+                .partner-marquee-container:hover .partner-marquee-track {
+                    animation-play-state: paused;
+                }
+            </style>
+            @endif
 
             <!-- Navigation Links Row & Social Icons Row (Matching Screenshot) -->
             <div class="border-t border-zinc-200 pt-8 pb-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-600">
@@ -458,10 +549,10 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('admin.login') }}" class="hover:text-zinc-900 transition-colors">Admin Login</a>
-                    <span class="text-zinc-300">&bull;</span>
-                    <a href="{{ route('author.login') }}" class="hover:text-zinc-900 transition-colors">Author Portal</a>
+                    <span class="text-zinc-500">Developed by</span>
+                    <a href="https://sarkarit.com/" class="font-medium hover:text-zinc-900 transition-colors">Sarkar IT</a>
                 </div>
+
             </div>
 
         </div>

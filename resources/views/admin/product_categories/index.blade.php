@@ -8,16 +8,11 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">Catalog Taxonomy</span>
-                <span class="text-xs text-slate-400 font-medium">Materials & Building Products</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Product Categories</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Manage building product categories. Admin creates these categories first, and then authors and admins select them from the dropdown when uploading products.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Product Categories</h1>
         </div>
         <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
-                Total Categories: {{ $categories->total() }}
+            <span class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-2xs">
+                Total: {{ $categories->total() }}
             </span>
         </div>
     </div>
