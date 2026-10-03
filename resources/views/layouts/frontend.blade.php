@@ -191,7 +191,6 @@
                             <span class="text-6xl md:text-7xl font-black tracking-tight text-black nook-logo-text lowercase" style="font-family: 'Cinzel', serif;">{{ $siteLogoText }}</span>
                         </div>
                     @endif
-
                 </a>
             </div>
 
