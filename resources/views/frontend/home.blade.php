@@ -148,7 +148,7 @@
         </div>
 
 
-       
+        <!-- ================= RIGHT COLUMN: PROPERTY SELL POST & PRODUCTS CATALOG (approx 32% / 4 cols) ================= -->
         <div class="lg:col-span-4 space-y-10">
 
             <!-- Section 1: PROPERTY SELL POST (Exact match to Image 1 Right Column) -->
